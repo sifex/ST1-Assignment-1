@@ -27,8 +27,9 @@
 
         <android.support.design.widget.TabLayout
             android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:tabMode="scrollable" />
 
     </android.support.design.widget.AppBarLayout>
 
@@ -39,7 +40,7 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_plus_icon"
-        app:backgroundTint="@android:color/holo_green_light" />
+        app:backgroundTint="@color/colorPrimary" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/container"
