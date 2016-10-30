@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -55,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
 
     public int numberOfTabs = 50;
     public ArrayList<CheckBox> tasks = new ArrayList<>();
+
+    public static final String PREFS_NAME = "Tasks";
 
     private TaskDbHelper mHelper;
 
@@ -165,7 +169,9 @@ public class MainActivity extends AppCompatActivity {
             {
                 if ( isChecked )
                 {
-                    ll.removeView(cb);
+                    cb.setTextColor(Color.GRAY);
+                } else {
+                    cb.setTextColor(Color.BLACK);
                 }
 
             }
