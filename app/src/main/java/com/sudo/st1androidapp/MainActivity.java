@@ -1,12 +1,10 @@
 package com.sudo.st1androidapp;
 
-import android.content.DialogInterface;
 import android.icu.text.SimpleDateFormat;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -15,7 +13,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -33,6 +30,7 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import static com.sudo.st1androidapp.R.id.checkBoxContainer;
@@ -45,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
     public ViewPager mViewPager;
 
 
-    public int numberOfTabs = 2;
+    public int numberOfTabs = 50;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,22 +68,15 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                final String TAG = "MainActivity";
-                final EditText taskEditText = new EditText(getApplicationContext());
-                AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
-                        .setTitle("Add a new task")
-                        .setMessage("What do you want to do next?")
-                        .setView(taskEditText)
-                        .setPositiveButton("Add", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String task = String.valueOf(taskEditText.getText());
-                                Log.d(TAG, "Task to add: " + task);
-                            }
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .create();
-                dialog.show();
+
+                PlaceholderFragment currentFragment = (PlaceholderFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
+                LinearLayout ll = (LinearLayout) currentFragment.rootView.findViewById(R.id.ll);
+
+                CheckBox cb = new CheckBox(getApplicationContext());
+                cb.setText("I'm dynamic!");
+
+                ll.addView(cb);
+
             }
         });
     }
@@ -108,9 +99,7 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         } else if(id == R.id.action_addDays) {
-            numberOfTabs += 10;
-            mSectionsPagerAdapter.notifyDataSetChanged();
-            return true;
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -146,31 +135,11 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
+        }
 
-
-            CheckBox cb =
-            fab.setOnClickListener(new View.OnClickListener() {
-
-                @Override
-                public void onClick(View view) {
-                    final String TAG = "MainActivity";
-                    final EditText taskEditText = new EditText(getApplicationContext());
-                    AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
-                            .setTitle("Add a new task")
-                            .setMessage("What do you want to do next?")
-                            .setView(taskEditText)
-                            .setPositiveButton("Add", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    String task = String.valueOf(taskEditText.getText());
-                                    Log.d(TAG, "Task to add: " + task);
-                                }
-                            })
-                            .setNegativeButton("Cancel", null)
-                            .create();
-                    dialog.show();
-                }
-            });
+        @Override
+        public View getView() {
+            return rootView;
         }
 
     }
@@ -181,21 +150,28 @@ public class MainActivity extends AppCompatActivity {
      */
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
+        public ArrayList<Fragment> frags = new ArrayList<>(numberOfTabs);
+
         private SectionsPagerAdapter(FragmentManager fm) {
+
             super(fm);
+            for(int i = 0; i <= numberOfTabs - 1; i++) {
+                frags.add(PlaceholderFragment.newInstance(i));
+            }
         }
 
         @Override
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+            // return PlaceholderFragment.newInstance(position + 1);
+
+            return frags.get(position);
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return numberOfTabs;
+            return frags.size();
         }
 
         @Override
