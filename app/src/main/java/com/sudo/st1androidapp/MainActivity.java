@@ -4,6 +4,7 @@ import android.icu.text.SimpleDateFormat;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -18,9 +19,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.Date;
+
+import static com.sudo.st1androidapp.R.id.checkBoxContainer;
+import static com.sudo.st1androidapp.R.id.container;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,13 +44,15 @@ public class MainActivity extends AppCompatActivity {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+    private PlaceholderFragment mPlaceholderFragment;
 
-    public TextView textView;
+    public int numberOfTabs = 2;
 
     /**
      * The {@link ViewPager} that will host the section contents.
      */
-    private ViewPager mViewPager;
+    public ViewPager mViewPager;
+    LinearLayout mCheckBoxContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,19 +66,25 @@ public class MainActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager = (ViewPager) findViewById(container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+
+        ScrollView sv = new ScrollView(this);
+        final LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        sv.addView(ll);
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-
+                CheckBox cb = new CheckBox(getApplicationContext());
+                cb.setText("I'm dynamic!");
+                ll.addView(cb);
             }
         });
 
@@ -89,6 +108,10 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        } else if(id == R.id.action_addDays) {
+            numberOfTabs += 10;
+            mSectionsPagerAdapter.notifyDataSetChanged();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -103,8 +126,14 @@ public class MainActivity extends AppCompatActivity {
          * fragment.
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
+        public View rootView;
+        public CheckBox checkBox;
 
         public PlaceholderFragment() {
+        }
+
+        public void changeText() {
+
         }
 
         /**
@@ -120,11 +149,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
+        public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+            this.rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
             return rootView;
         }
@@ -134,9 +160,9 @@ public class MainActivity extends AppCompatActivity {
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
-    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+    public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
-        public SectionsPagerAdapter(FragmentManager fm) {
+        private SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 
@@ -150,25 +176,22 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 5;
+            return numberOfTabs;
         }
 
         @Override
         public CharSequence getPageTitle(int position) {
             Date currentDate = new Date();
-            switch (position) {
-                case 0:
-                    return new SimpleDateFormat("yyyy-MM-dd").format(currentDate);
-                case 1:
-                    return new SimpleDateFormat("yyyy-MM-dd").format(new Date(currentDate.getTime() + (1000 * 60 * 60 * 24)));
-                case 2:
-                    return "SECTION 3";
-                case 3:
-                    return "SECTION 4";
-                case 4:
-                    return "SECTION 5";
+
+            int daysAdded = position * (1000 * 60 * 60 * 24);
+
+            if(position == 0) {
+                return "Today";
+            } else if (position == 1) {
+                return "Tomorrow";
+            } else {
+                return new SimpleDateFormat("dd MMMM yy").format(new Date(currentDate.getTime() + daysAdded));
             }
-            return null;
         }
     }
 }
