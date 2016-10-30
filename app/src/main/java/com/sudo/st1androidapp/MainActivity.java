@@ -1,10 +1,12 @@
 package com.sudo.st1androidapp;
 
+import android.content.DialogInterface;
 import android.icu.text.SimpleDateFormat;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -13,6 +15,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -41,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private SectionsPagerAdapter mSectionsPagerAdapter;
     public ViewPager mViewPager;
 
+
     public int numberOfTabs = 2;
 
     @Override
@@ -66,15 +70,22 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-
-
-                LinearLayout ll = (LinearLayout) mViewPager.findViewById(R.id.ll);
-
-                CheckBox cb = new CheckBox(getApplicationContext());
-                cb.setText("I'm dynamic!");
-
-                ll.addView(cb);
-
+                final String TAG = "MainActivity";
+                final EditText taskEditText = new EditText(getApplicationContext());
+                AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
+                        .setTitle("Add a new task")
+                        .setMessage("What do you want to do next?")
+                        .setView(taskEditText)
+                        .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String task = String.valueOf(taskEditText.getText());
+                                Log.d(TAG, "Task to add: " + task);
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .create();
+                dialog.show();
             }
         });
     }
@@ -115,9 +126,6 @@ public class MainActivity extends AppCompatActivity {
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
         public View rootView;
-        public CheckBox checkBox;
-        public PlaceholderFragment fragment;
-        public ViewGroup container;
 
         public PlaceholderFragment() {
         }
@@ -138,11 +146,31 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
-        }
 
-        @Override
-        public View getView() {
-            return rootView;
+
+            CheckBox cb =
+            fab.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+                    final String TAG = "MainActivity";
+                    final EditText taskEditText = new EditText(getApplicationContext());
+                    AlertDialog dialog = new AlertDialog.Builder(getApplicationContext())
+                            .setTitle("Add a new task")
+                            .setMessage("What do you want to do next?")
+                            .setView(taskEditText)
+                            .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    String task = String.valueOf(taskEditText.getText());
+                                    Log.d(TAG, "Task to add: " + task);
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .create();
+                    dialog.show();
+                }
+            });
         }
 
     }
