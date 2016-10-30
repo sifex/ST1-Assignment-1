@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +24,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -35,24 +37,11 @@ import static com.sudo.st1androidapp.R.id.container;
 
 public class MainActivity extends AppCompatActivity {
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
+
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    private PlaceholderFragment mPlaceholderFragment;
+    public ViewPager mViewPager;
 
     public int numberOfTabs = 2;
-
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    public ViewPager mViewPager;
-    LinearLayout mCheckBoxContainer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,24 +61,23 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-
-        ScrollView sv = new ScrollView(this);
-        final LinearLayout ll = new LinearLayout(this);
-        ll.setOrientation(LinearLayout.VERTICAL);
-        sv.addView(ll);
-
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
+
+
+                LinearLayout ll = (LinearLayout) mViewPager.findViewById(R.id.ll);
+
                 CheckBox cb = new CheckBox(getApplicationContext());
                 cb.setText("I'm dynamic!");
+
                 ll.addView(cb);
+
             }
         });
-
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -128,12 +116,10 @@ public class MainActivity extends AppCompatActivity {
         private static final String ARG_SECTION_NUMBER = "section_number";
         public View rootView;
         public CheckBox checkBox;
+        public PlaceholderFragment fragment;
+        public ViewGroup container;
 
         public PlaceholderFragment() {
-        }
-
-        public void changeText() {
-
         }
 
         /**
@@ -150,10 +136,15 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            this.rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
+            rootView = inflater.inflate(R.layout.fragment_main, container, false);
             return rootView;
         }
+
+        @Override
+        public View getView() {
+            return rootView;
+        }
+
     }
 
     /**

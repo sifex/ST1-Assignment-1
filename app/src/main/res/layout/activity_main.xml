@@ -5,8 +5,8 @@
     android:id="@+id/main_content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fitsSystemWindows="true"
-    tools:context="com.sudo.st1androidapp.MainActivity">
+    tools:context="com.sudo.st1androidapp.MainActivity"
+    android:fitsSystemWindows="true">
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -16,12 +16,6 @@
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_plus_icon"
         app:backgroundTint="@color/colorPrimary" />
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -47,5 +41,12 @@
             app:tabMode="scrollable" />
 
     </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:layout_height="match_parent"
+        android:paddingBottom="@dimen/fab_margin" />
 
 </android.support.design.widget.CoordinatorLayout>
