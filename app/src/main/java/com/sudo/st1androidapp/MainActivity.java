@@ -1,12 +1,15 @@
 package com.sudo.st1androidapp;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.icu.text.SimpleDateFormat;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
@@ -53,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     public int numberOfTabs = 50;
     public ArrayList<CheckBox> tasks = new ArrayList<>();
 
+    private TaskDbHelper mHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,17 +75,18 @@ public class MainActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        mViewPager.setOffscreenPageLimit(1000);
+
+        final PlaceholderFragment currentFragment = (PlaceholderFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
-                askName();
+                askName(currentFragment);
             }
         });
-
-        PlaceholderFragment currentFragment = (PlaceholderFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
     }
 
     @Override
@@ -107,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public String askName() {
+    public String askName(PlaceholderFragment currentFragment) {
 
         final EditText taskEditText = new EditText(MainActivity.this);
         AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
@@ -118,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         String task = String.valueOf(taskEditText.getText());
+
                         addCheck(task);
                     }
                 })
@@ -129,6 +136,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void addCheck(String name) {
+        /* SQLiteDatabase db = mHelper.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(TaskContract.TaskEntry.COL_TASK_TITLE, name);
+        db.insertWithOnConflict(TaskContract.TaskEntry.TABLE,
+                null,
+                values,
+                SQLiteDatabase.CONFLICT_REPLACE);
+        db.close(); */
+
+
         PlaceholderFragment currentFragment = (PlaceholderFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
         final LinearLayout ll = (LinearLayout) currentFragment.rootView.findViewById(R.id.ll);
 
@@ -193,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
         public ArrayList<Fragment> frags = new ArrayList<>(numberOfTabs);
 
@@ -236,13 +253,37 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class TaskContract {
-        public static final String DB_NAME = "com.sudo.st1androidapp.db";
+        public static final String DB_NAME = "com.sudo.st1androidapp";
         public static final int DB_VERSION = 1;
 
         public class TaskEntry implements BaseColumns {
             public static final String TABLE = "tasks";
 
             public static final String COL_TASK_TITLE = "title";
+            public static final String COL_TASK_DATE = "date";
+        }
+    }
+
+    public class TaskDbHelper extends SQLiteOpenHelper {
+
+        public TaskDbHelper(Context context) {
+            super(context, TaskContract.DB_NAME, null, TaskContract.DB_VERSION);
+        }
+
+        @Override
+        public void onCreate(SQLiteDatabase db) {
+            String createTable = "CREATE TABLE " + TaskContract.TaskEntry.TABLE + " ( " +
+                    TaskContract.TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    TaskContract.TaskEntry.COL_TASK_TITLE + " TEXT NOT NULL);" +
+                    TaskContract.TaskEntry.COL_TASK_DATE + " DATE NOT NULL);";
+
+            db.execSQL(createTable);
+        }
+
+        @Override
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS " + TaskContract.TaskEntry.TABLE);
+            onCreate(db);
         }
     }
 }
