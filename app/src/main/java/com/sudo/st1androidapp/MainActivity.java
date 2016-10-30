@@ -1,5 +1,7 @@
 package com.sudo.st1androidapp;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.icu.text.SimpleDateFormat;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -13,6 +15,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,14 +25,18 @@ import android.view.ViewGroup;
 
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import android.provider.BaseColumns;
+
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -44,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public int numberOfTabs = 50;
+    public ArrayList<CheckBox> tasks = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,17 +76,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-
-                PlaceholderFragment currentFragment = (PlaceholderFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
-                LinearLayout ll = (LinearLayout) currentFragment.rootView.findViewById(R.id.ll);
-
-                CheckBox cb = new CheckBox(getApplicationContext());
-                cb.setText("I'm dynamic!");
-
-                ll.addView(cb);
-
+                askName();
             }
         });
+
+        PlaceholderFragment currentFragment = (PlaceholderFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
     }
 
     @Override
@@ -105,9 +107,56 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
+    public String askName() {
+
+        final EditText taskEditText = new EditText(MainActivity.this);
+        AlertDialog dialog = new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Add a new task")
+                .setMessage("What do you want to do next?")
+                .setView(taskEditText)
+                .setPositiveButton("Add", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String task = String.valueOf(taskEditText.getText());
+                        addCheck(task);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .create();
+        dialog.show();
+
+        return taskEditText.toString();
+    }
+
+    public void addCheck(String name) {
+        PlaceholderFragment currentFragment = (PlaceholderFragment) mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
+        final LinearLayout ll = (LinearLayout) currentFragment.rootView.findViewById(R.id.ll);
+
+        final CheckBox cb = new CheckBox(getApplicationContext());
+        cb.setText(name);
+
+        tasks.add(cb);
+        cb.setId(tasks.size() + 1);
+
+        ll.addView(cb);
+
+        CheckBox repeatChkBx = ( CheckBox ) currentFragment.rootView.findViewById( tasks.size() + 1 );
+        repeatChkBx.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
+            {
+                if ( isChecked )
+                {
+                    ll.removeView(cb);
+                }
+
+            }
+        });
+    }
+
+    /* -------------- */
+
     public static class PlaceholderFragment extends Fragment {
         /**
          * The fragment argument representing the section number for this
@@ -144,10 +193,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /**
-     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
     public class SectionsPagerAdapter extends FragmentStatePagerAdapter {
 
         public ArrayList<Fragment> frags = new ArrayList<>(numberOfTabs);
@@ -187,6 +232,17 @@ public class MainActivity extends AppCompatActivity {
             } else {
                 return new SimpleDateFormat("dd MMMM yy").format(new Date(currentDate.getTime() + daysAdded));
             }
+        }
+    }
+
+    public class TaskContract {
+        public static final String DB_NAME = "com.sudo.st1androidapp.db";
+        public static final int DB_VERSION = 1;
+
+        public class TaskEntry implements BaseColumns {
+            public static final String TABLE = "tasks";
+
+            public static final String COL_TASK_TITLE = "title";
         }
     }
 }
